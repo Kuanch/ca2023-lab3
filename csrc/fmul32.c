@@ -1,23 +1,5 @@
 #include <stdio.h>
-
 #include <stdint.h>
-
-
-uint32_t highestbit(register uint32_t x) {
-    x |= (x >> 1);
-    x |= (x >> 2);
-    x |= (x >> 4);
-    x |= (x >> 8);
-    x |= (x >> 16);
-    /* count ones (population count) */
-    x -= ((x >> 1) & 0x55555555);
-    register int32_t num3333 = 0x33333333;
-    x = ((x >> 2) & num3333) + (x & num3333);
-    x = ((x >> 4) + x) & 0x0f0f0f0f;
-    x += (x >> 8);
-    x += (x >> 16);
-    return x & 0x7f;
-}
 
 
 int32_t mmul(register int32_t a, register int32_t b) {
@@ -87,7 +69,21 @@ int32_t fmul32(int32_t ia, int32_t ib) {
 int main() {
     float a = 1.65;
     float b = 2.5;
-    int32_t ia = *(int32_t *) &a;    // 0 01111111 10000000000000000000000
-    int32_t ib = *(int32_t *) &b;    // 0 10000000 01000000000000000000000
-    int32_t mul_r = fmul32(ia, ib);
+    int32_t ia = *(int32_t *) &a;
+    int32_t ib = *(int32_t *) &b;
+    *((volatile int *) (4)) = fmul32(ia, ib);
+
+    a = 0;
+    b = 2.5;
+    ia = *(int32_t *) &a;
+    ib = *(int32_t *) &b;
+    *((volatile int *) (8)) = fmul32(ia, ib);
+
+    a = 1.33;
+    b = 4.2556;
+    ia = *(int32_t *) &a;
+    ib = *(int32_t *) &b;
+    *((volatile int *) (12)) = fmul32(ia, ib);
+
+    return 0;
 }
